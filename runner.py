@@ -14,7 +14,7 @@ import pickle
 import os
 import time
 
-BUFFER_SIZE = 60000
+BUFFER_SIZE = 48000
 
 ACTIONS = 2  #  jump or keep stay
 GAMMA = 0.99  # decay rate
@@ -39,20 +39,21 @@ def buildmodel(model_file = None):
         print("load model from existing file")
     else:
         print("build the model from beginning")
+        input_shape = (img_rows, img_cols, 4)
         model = Sequential()
         model.add(
-            Conv2D(32, (8, 8), padding='same', strides=(4, 4), input_shape=(img_cols, img_rows, img_channels)))  # 80*80*4
+            Conv2D(32, kernel_size=(4, 4),
+                   padding='same',
+                   strides=(2, 2),
+                   activation='relu',
+                   input_shape=input_shape))  # 80*80*4
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Activation('relu'))
-        model.add(Conv2D(64, (4, 4), strides=(2, 2), padding='same'))
+        model.add(Conv2D(64, (3, 3), strides=(2, 2), activation='relu',padding='same'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Activation('relu'))
-        model.add(Conv2D(64, (3, 3), strides=(1, 1), padding='same'))
+        model.add(Conv2D(64, (2, 2), strides=(1, 1), activation='relu', padding='same'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Activation('relu'))
         model.add(Flatten())
-        model.add(Dense(512))
-        model.add(Activation('relu'))
+        model.add(Dense(512,activation='relu'))
         model.add(Dense(ACTIONS))
         adam = Adam(lr=LEARNING_RATE)
         model.compile(loss='mse', optimizer=adam)
@@ -111,7 +112,7 @@ def train(env):
         else :
             current_s = next_s
 
-        if (step) % 3000 == 0:
+        if (step) % 10000 == 0:
             env.pause()
             save_breakpoint((epsilon,step),model,data_buffer)
             env.resume()
