@@ -13,6 +13,7 @@ import random
 import pickle
 import os
 import time
+import hickle
 
 BUFFER_SIZE = 48000
 
@@ -25,7 +26,7 @@ EXPLORE = 100000  # frames over which to anneal epsilon
 FINAL_EPSILON = 0.0001  # minimum epsilon to keep exploration
 INITIAL_EPSILON = 0.1
 
-BUFFER_FILE = "buffer.pkl"
+BUFFER_FILE = "buffer.hd5"
 MODEL_FILE = "current.model"
 PARA_FILE = "parameters.pkl"
 
@@ -70,11 +71,18 @@ def load_obj(name):
     with open(name , 'rb') as f:
         return pickle.load(f)
 
+def save_hickle(obj, name):
+    hickle.dump(obj, name, mode='w')
+
+
+def load_hickle(name):
+    return hickle.load(name)
 
 def save_breakpoint(parameters,model,data_buffer):
     model.save(MODEL_FILE)
     save_obj(parameters,PARA_FILE)
-    save_obj(data_buffer, BUFFER_FILE)
+    # save_obj(data_buffer, BUFFER_FILE)
+    save_hickle(data_buffer, BUFFER_FILE)
 
 def train(env):
     mode_file = MODEL_FILE if os.path.exists(MODEL_FILE) else None
@@ -150,7 +158,8 @@ def train(env):
         last_time = time.time()
 
 env = DinoEnv("chromedriver.exe") if os.name=="nt" else DinoEnv("./chromedriver")
-data_buffer = load_obj(BUFFER_FILE) if os.path.exists(BUFFER_FILE) else deque(maxlen=BUFFER_SIZE)
+# data_buffer = load_obj(BUFFER_FILE) if os.path.exists(BUFFER_FILE) else deque(maxlen=BUFFER_SIZE)
+data_buffer = load_hickle(BUFFER_FILE) if os.path.exists(BUFFER_FILE) else deque(maxlen=BUFFER_SIZE)
 
 try:
     train(env)
