@@ -1,0 +1,6 @@
+47a48
+>         chrome_options.add_argument("--no-sandbox")
+133c134
+<         self._display.send(image)
+---
+>         # self._display.send(image)
