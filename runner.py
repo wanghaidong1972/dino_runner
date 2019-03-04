@@ -82,7 +82,7 @@ def save_breakpoint(parameters,model,data_buffer):
     model.save(MODEL_FILE)
     save_obj(parameters,PARA_FILE)
     # save_obj(data_buffer, BUFFER_FILE)
-    save_hickle(data_buffer, BUFFER_FILE)
+    #save_hickle(data_buffer, BUFFER_FILE)
 
 def train(env):
     mode_file = MODEL_FILE if os.path.exists(MODEL_FILE) else None
